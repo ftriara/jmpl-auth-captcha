@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CaptchaController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Auth::routes();
+
+Route::post('/captcha-validation', [CaptchaController::class, 'captchaFormValidate']);
+Route::get('/reload-captcha', [CaptchaController::class, 'reloadCaptcha']);
+
+Route::middleware(['2fa'])->group(function(){
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::post('/2fa', function(){
+        return redirect(route('home'));
+    })->name('2fa');
+});
+
+Route::get('/complete-registration', [LoginController::class, 'complete'])->name('complete-registration');
